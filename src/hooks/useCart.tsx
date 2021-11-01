@@ -28,15 +28,13 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     const storagedCart = localStorage.getItem('@RocketShoes:cart');
 
     if (storagedCart) {
-      return JSON.parse(storagedCart);
+        return JSON.parse(storagedCart);
     }
 
     return [];
   });
 
   const [products, setProducts] = useState<Product[]>([]);
-
-
 
   useEffect(() => {
     async function loadProducts() {
@@ -66,6 +64,8 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
         setCart(newCart);
 
         localStorage.setItem('@RocketShoes:cart', JSON.stringify(newCart));
+
+        return;
       }
 
       // verificar se o produto existe no estoque 
@@ -74,10 +74,10 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
         return response.data;
       })
 
-
-
       if(inStock.amount < 1) {
-        toast.error("Estoque esgotado!")
+        toast.error("Estoque esgotado!");
+
+        return
       }
 
       const item = {
@@ -86,8 +86,6 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       }
 
       const product = await axios.get(`http://localhost:3333/products/${productId}`).then(res => res.data);
-
-      console.log(product);
       
       setCart([...cart, {
           amount: 1,
@@ -95,14 +93,14 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
           image: product.image,
           price: product.price,
           title: product.title
-      }])
+      }]);
 
       localStorage.setItem('@RocketShoes:cart', JSON.stringify(cart));
-
 
     } catch(err) {
       toast(`Falaha ao adicionar item! ${err}`);
     }
+
   };
 
   const removeProduct = (productId: number) => {
@@ -145,7 +143,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   return (
     <CartContext.Provider
-      value={{ cart, products, addProduct, removeProduct, updateProductAmount }}
+      value={{cart, products, addProduct, removeProduct, updateProductAmount }}
     >
       {children}
     </CartContext.Provider>
